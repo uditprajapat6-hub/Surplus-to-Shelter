@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createDonation } from '../services/api';
+import { createDonation, autoMatchDonation } from '../services/api';
 
 export default function DonationForm() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [matchResult, setMatchResult] = useState(null);
 
   const [formData, setFormData] = useState({
     food_name: '',
@@ -20,7 +21,11 @@ export default function DonationForm() {
     pickup_address: '',
     latitude: 0,
     longitude: 0,
-    description: ''
+    description: '',
+    estimated_servings: '',
+    pickup_available_from: '',
+    pickup_available_until: '',
+    packaging_condition: 'GOOD'
   });
 
   const handleChange = (e) => {
@@ -36,20 +41,33 @@ export default function DonationForm() {
     setLoading(true);
     setError(null);
     setSuccess(false);
+    setMatchResult(null);
 
     try {
       // Format data for backend
       const payload = {
         ...formData,
         quantity: parseFloat(formData.quantity) || 0,
+        estimated_servings: parseInt(formData.estimated_servings) || 0,
         allergens: formData.allergens.split(',').map(a => a.trim()).filter(a => a),
         preparation_time: new Date(formData.preparation_time).toISOString(),
         expiry_time: new Date(formData.expiry_time).toISOString(),
+        pickup_available_from: formData.pickup_available_from ? new Date(formData.pickup_available_from).toISOString() : null,
+        pickup_available_until: formData.pickup_available_until ? new Date(formData.pickup_available_until).toISOString() : null,
       };
 
-      await createDonation(payload);
+      const donation = await createDonation(payload);
+      
+      // Trigger automatic matching
+      try {
+        const match = await autoMatchDonation(donation.id);
+        setMatchResult(match);
+      } catch (matchErr) {
+        console.warn("No suitable shelter found immediately.");
+      }
+      
       setSuccess(true);
-      setTimeout(() => navigate('/donor'), 2000); // Redirect after success
+      setTimeout(() => navigate('/donor'), 4000); // Redirect after success
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to submit donation. Please check your inputs.');
     } finally {
@@ -62,8 +80,32 @@ export default function DonationForm() {
       <div className="max-w-2xl mx-auto mt-10 p-8 bg-white rounded-xl shadow-md text-center border-t-4 border-brand-green">
         <div className="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">✓</div>
         <h2 className="text-2xl font-bold text-gray-800 mb-2">Donation Posted Successfully!</h2>
-        <p className="text-gray-600 mb-6">Your surplus food is now looking for a match.</p>
-        <p className="text-sm text-gray-400">Redirecting to dashboard...</p>
+        
+        {matchResult ? (
+          <div className="mt-6 bg-brand-light p-6 rounded-lg text-left inline-block w-full max-w-md mx-auto">
+            <h3 className="font-bold text-brand-green mb-4 border-b pb-2">Best Match Found</h3>
+            <p className="text-sm text-gray-600 mb-1">Matched Shelter:</p>
+            <p className="font-bold text-lg mb-3">{matchResult.shelter.organization_name}</p>
+            
+            <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+              <div>
+                <p className="text-gray-500">Distance:</p>
+                <p className="font-semibold">{matchResult.distance_km} km</p>
+              </div>
+              <div>
+                <p className="text-gray-500">Match Score:</p>
+                <p className="font-semibold text-brand-green">{matchResult.compatibility_score}%</p>
+              </div>
+            </div>
+            <div className="inline-block bg-brand-emerald text-white text-xs font-bold px-3 py-1 rounded-full">
+              Status: MATCHED
+            </div>
+          </div>
+        ) : (
+          <p className="text-gray-600 mb-6">Your surplus food is now looking for a match.</p>
+        )}
+        
+        <p className="text-sm text-gray-400 mt-6">Redirecting to dashboard...</p>
       </div>
     );
   }

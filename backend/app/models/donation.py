@@ -13,8 +13,11 @@ class FoodCategory(str, Enum):
 
 class DonationStatus(str, Enum):
     POSTED = "POSTED"
+    MATCHING = "MATCHING"
     MATCHED = "MATCHED"
-    IN_TRANSIT = "IN_TRANSIT"
+    DRIVER_ASSIGNED = "DRIVER_ASSIGNED"
+    PICKED_UP = "PICKED_UP"
+    OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY"
     DELIVERED = "DELIVERED"
     EXPIRED = "EXPIRED"
 
@@ -32,6 +35,10 @@ class DonationBase(BaseModel):
     longitude: float
     description: Optional[str] = None
     image_url: Optional[str] = None
+    estimated_servings: Optional[int] = None
+    pickup_available_from: Optional[datetime] = None
+    pickup_available_until: Optional[datetime] = None
+    packaging_condition: Optional[str] = "GOOD"
 
 class DonationCreate(DonationBase):
     pass
@@ -40,6 +47,8 @@ class DonationResponse(DonationBase):
     id: str
     status: DonationStatus = DonationStatus.POSTED
     created_at: datetime
+    matched_shelter_id: Optional[str] = None
+    match_score: Optional[float] = None
 
     class Config:
         populate_by_name = True

@@ -26,10 +26,10 @@ async def create_delivery(delivery: DeliveryCreate):
         result = db.deliveries.insert_one(delivery_data)
         delivery_data["id"] = str(result.inserted_id)
         
-        # Also update the donation status to MATCHED
+        # Also update the donation status to DRIVER_ASSIGNED
         db.donations.update_one(
             {"_id": ObjectId(delivery.donation_id)},
-            {"$set": {"status": "MATCHED"}}
+            {"$set": {"status": "DRIVER_ASSIGNED"}}
         )
     else:
         # Mock mode

@@ -22,7 +22,7 @@ export default function DonorDashboard() {
     fetchDonations();
   }, []);
 
-  const activeDonations = donations.filter(d => d.status === 'POSTED' || d.status === 'MATCHED' || d.status === 'IN_TRANSIT');
+  const activeDonations = donations.filter(d => !['DELIVERED', 'EXPIRED'].includes(d.status));
   const completedDonations = donations.filter(d => d.status === 'DELIVERED');
   
   // Calculate total food rescued (mock metric for now based on quantity)
@@ -35,13 +35,21 @@ export default function DonorDashboard() {
           <h1 className="text-3xl font-bold text-brand-charcoal">Donor Dashboard</h1>
           <p className="text-brand-charcoal opacity-70">Manage your surplus food donations</p>
         </div>
-        <Link 
-          to="/donor/new" 
-          className="bg-brand-green text-white px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition shadow-md flex items-center gap-2"
-        >
-          <Package size={20} />
-          Post Surplus Food
-        </Link>
+        <div className="flex gap-3">
+          <Link 
+            to="/donor/history" 
+            className="bg-white text-brand-green border border-brand-green px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2"
+          >
+            History
+          </Link>
+          <Link 
+            to="/donor/new" 
+            className="bg-brand-green text-white px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition shadow-md flex items-center gap-2"
+          >
+            <Package size={20} />
+            Post Surplus Food
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -64,28 +72,45 @@ export default function DonorDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {donations.map(donation => (
-          <div key={donation.id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex justify-between items-start mb-3">
-              <h3 className="font-bold text-lg">{donation.food_name}</h3>
-              <span className={`px-2 py-1 text-xs rounded-full font-bold ${
-                donation.status === 'DELIVERED' ? 'bg-green-100 text-green-700' : 
-                donation.status === 'MATCHED' ? 'bg-blue-100 text-blue-700' :
-                'bg-orange-100 text-orange-700'
-              }`}>
-                {donation.status}
-              </span>
+          <div key={donation.id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
+            <div>
+              <div className="flex justify-between items-start mb-3">
+                <h3 className="font-bold text-lg">{donation.food_name}</h3>
+                <span className={`px-2 py-1 text-[10px] uppercase rounded-full font-bold ${
+                  donation.status === 'DELIVERED' ? 'bg-green-100 text-green-700' : 
+                  donation.status === 'MATCHED' ? 'bg-blue-100 text-blue-700' :
+                  donation.status === 'DRIVER_ASSIGNED' ? 'bg-indigo-100 text-indigo-700' :
+                  donation.status === 'EXPIRED' ? 'bg-red-100 text-red-700' :
+                  'bg-orange-100 text-orange-700'
+                }`}>
+                  {donation.status.replace(/_/g, ' ')}
+                </span>
+              </div>
+              <p className="text-sm text-gray-600 mb-2">Category: {donation.food_category}</p>
+              <p className="text-sm font-semibold mb-2">{donation.quantity} {donation.unit}</p>
+              
+              {/* Expiry / Safe Until */}
+              <div className="bg-gray-50 p-2 rounded-lg mb-4 text-xs">
+                <div className="flex items-center gap-1 text-gray-600 mb-1">
+                  <Clock size={12} /> Safe until: {new Date(donation.expiry_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                </div>
+                {(() => {
+                  const now = new Date();
+                  const expiry = new Date(donation.expiry_time);
+                  const diffMs = expiry - now;
+                  if (diffMs <= 0 || donation.status === 'EXPIRED') {
+                    return <p className="font-bold text-red-500">EXPIRED</p>;
+                  }
+                  const diffHrs = Math.floor(diffMs / 3600000);
+                  const diffMins = Math.floor((diffMs % 3600000) / 60000);
+                  return <p className="font-bold text-brand-orange">Expires in {diffHrs}h {diffMins}m</p>;
+                })()}
+              </div>
             </div>
-            <p className="text-sm text-gray-600 mb-2">Category: {donation.food_category}</p>
-            <p className="text-sm font-semibold mb-4">{donation.quantity} {donation.unit}</p>
             
-            {donation.status === 'POSTED' && (
-              <Link 
-                to={`/donor/matches/${donation.id}`} 
-                className="block w-full text-center bg-brand-light text-brand-green border border-brand-green font-semibold py-2 rounded-lg hover:bg-brand-green hover:text-white transition"
-              >
-                Find Recipient
-              </Link>
-            )}
+            <button className="w-full text-center bg-gray-100 text-gray-700 font-semibold py-2 rounded-lg hover:bg-gray-200 transition">
+              View Details
+            </button>
           </div>
         ))}
       </div>

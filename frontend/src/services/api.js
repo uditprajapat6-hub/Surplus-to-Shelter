@@ -30,6 +30,11 @@ export const getMatches = async (donationId) => {
   return response.data;
 };
 
+export const autoMatchDonation = async (donationId) => {
+  const response = await api.post(`/matching/${donationId}/auto-match`);
+  return response.data;
+};
+
 export const getDeliveries = async () => {
   const response = await api.get('/deliveries');
   return response.data;

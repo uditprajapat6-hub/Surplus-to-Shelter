@@ -145,6 +145,23 @@ function DeliveryCard({ delivery, onUpdate, isUpdating }) {
         {delivery.status !== 'DELIVERED' && (
           <MapRoute delivery={delivery} />
         )}
+
+        {/* Delivery Proof (Only when out for delivery) */}
+        {delivery.status === 'OUT_FOR_DELIVERY' && (
+          <div className="mt-4 p-4 border border-dashed border-gray-300 rounded-lg bg-gray-50">
+            <p className="text-sm font-bold text-gray-700 mb-2">Delivery Proof Required</p>
+            <div className="flex gap-2 mb-2">
+              <button className="flex-1 bg-white border border-gray-300 text-gray-600 text-xs py-2 rounded shadow-sm hover:bg-gray-50 flex justify-center items-center gap-1">
+                <Navigation size={14}/> Upload Photo
+              </button>
+            </div>
+            <textarea 
+              placeholder="Optional delivery note (e.g. Left at front desk)" 
+              className="w-full text-xs p-2 border border-gray-200 rounded resize-none focus:outline-none focus:border-brand-green"
+              rows="2"
+            ></textarea>
+          </div>
+        )}
       </div>
       
       <div className="p-6 bg-gray-50 md:w-64 flex flex-col justify-center items-center text-center">
