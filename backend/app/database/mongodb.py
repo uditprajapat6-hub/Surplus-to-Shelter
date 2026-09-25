@@ -13,7 +13,7 @@ def connect_to_mongo():
     global client, db
     try:
         # We set a low serverSelectionTimeoutMS so it fails fast if MongoDB is not running locally
-        client = MongoClient(settings.MONGODB_URI, serverSelectionTimeoutMS=2000)
+        client = MongoClient(settings.MONGODB_URI, serverSelectionTimeoutMS=2000, tz_aware=True)
         # Verify connection
         client.admin.command('ping')
         db = client[settings.DATABASE_NAME]
