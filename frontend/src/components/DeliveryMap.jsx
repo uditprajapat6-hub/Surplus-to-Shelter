@@ -46,7 +46,7 @@ export default function DeliveryMap({ pickupLocation, destinationLocation, drive
       end = destinationLocation;
     }
 
-    if (start && end) {
+    if (start && end && (start[0] !== 0 || start[1] !== 0) && (end[0] !== 0 || end[1] !== 0)) {
       fetch(`https://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end[1]},${end[0]}?overview=full&geometries=geojson`)
         .then(res => res.json())
         .then(data => {
@@ -76,7 +76,7 @@ export default function DeliveryMap({ pickupLocation, destinationLocation, drive
 
   return (
     <div className="h-64 w-full rounded-xl overflow-hidden shadow-[0_1px_3px_0_rgba(15,23,42,0.05)] border border-slate-200 mt-4 relative z-0">
-      <MapContainer center={pickup} zoom={13} style={{ height: '100%', width: '100%' }}>
+      <MapContainer center={pickup} zoom={13} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -95,18 +95,18 @@ export default function DeliveryMap({ pickupLocation, destinationLocation, drive
         
         {pickupLocation && (
           <Marker position={pickupLocation}>
-            <Popup>
+            <Popup className="max-w-[250px]">
               <div className="font-bold text-orange-600">Pickup</div>
-              <div className="text-xs">{pickupAddress || 'Donor Location'}</div>
+              <div className="text-xs break-words whitespace-pre-wrap">{pickupAddress || 'Donor Location'}</div>
             </Popup>
           </Marker>
         )}
 
         {destinationLocation && (
           <Marker position={destinationLocation}>
-            <Popup>
+            <Popup className="max-w-[250px]">
               <div className="font-bold text-brand-green">Dropoff</div>
-              <div className="text-xs">{dropoffAddress || 'Shelter Location'}</div>
+              <div className="text-xs break-words whitespace-pre-wrap">{dropoffAddress || 'Shelter Location'}</div>
             </Popup>
           </Marker>
         )}
