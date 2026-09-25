@@ -181,7 +181,7 @@ export default function ShelterDashboard() {
                     <span className={`px-2.5 py-1 text-xs rounded-full font-bold ${
                       donation.status === 'DELIVERED' ? 'bg-green-100 text-green-700' : 'bg-brand-sky/10 text-brand-sky'
                     }`}>
-                      {donation.status.replace(/_/g, ' ')}
+                      {donation.status === 'DRIVER_ASSIGNED' ? 'PENDING DRIVER ACCEPT' : donation.status.replace(/_/g, ' ')}
                     </span>
                     {donation.driver_incentive > 0 && (
                       <div className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-md shadow-sm">

@@ -102,7 +102,7 @@ export default function DonorDashboard() {
                   donation.status === 'CANCELLED' ? 'bg-slate-100 text-slate-700' :
                   'bg-orange-100 text-orange-700'
                 }`}>
-                  {donation.status.replace(/_/g, ' ')}
+                  {donation.status === 'DRIVER_ASSIGNED' ? 'PENDING DRIVER ACCEPT' : donation.status.replace(/_/g, ' ')}
                 </span>
               </div>
               <p className="text-sm text-slate-600 mb-1 font-medium">{donation.food_category}</p>
