@@ -4,6 +4,8 @@ import { createDonation, autoMatchDonation } from '../services/api';
 import { MapPin, Search, Map as MapIcon, Crosshair } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import L from 'leaflet';
 
 // Fix for default marker icons in React Leaflet
@@ -335,12 +337,32 @@ export default function DonationForm() {
 
           <div>
             <label className="block text-sm font-bold text-slate-700 mb-1.5">Preparation Time *</label>
-            <input required type="datetime-local" name="preparation_time" value={formData.preparation_time} onChange={handleChange} className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-brand-green outline-none transition-all" />
+            <DatePicker
+              selected={formData.preparation_time ? new Date(formData.preparation_time) : null}
+              onChange={(date) => setFormData(prev => ({ ...prev, preparation_time: date }))}
+              showTimeSelect
+              timeFormat="hh:mm aa"
+              timeIntervals={15}
+              dateFormat="MMMM d, yyyy h:mm aa"
+              className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-brand-green outline-none transition-all"
+              required
+              placeholderText="Select date and time"
+            />
           </div>
 
           <div>
             <label className="block text-sm font-bold text-slate-700 mb-1.5">Safe-to-donate until *</label>
-            <input required type="datetime-local" name="expiry_time" value={formData.expiry_time} onChange={handleChange} className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-brand-green outline-none transition-all" />
+            <DatePicker
+              selected={formData.expiry_time ? new Date(formData.expiry_time) : null}
+              onChange={(date) => setFormData(prev => ({ ...prev, expiry_time: date }))}
+              showTimeSelect
+              timeFormat="hh:mm aa"
+              timeIntervals={15}
+              dateFormat="MMMM d, yyyy h:mm aa"
+              className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-brand-green outline-none transition-all"
+              required
+              placeholderText="Select date and time"
+            />
           </div>
 
           <div className="md:col-span-2">
