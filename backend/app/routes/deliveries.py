@@ -131,10 +131,10 @@ async def update_delivery_status(id: str, status_update: DeliveryStatusUpdate, c
             
         # OTP Validation
         if status_update.status == DeliveryStatus.PICKED_UP:
-            if existing.get("pickup_otp") and status_update.otp != existing.get("pickup_otp"):
+            if existing.get("pickup_otp") and (not status_update.otp or status_update.otp.strip() != existing.get("pickup_otp").strip()):
                 raise HTTPException(status_code=400, detail="Invalid Pickup OTP")
         elif status_update.status == DeliveryStatus.DELIVERED:
-            if existing.get("dropoff_otp") and status_update.otp != existing.get("dropoff_otp"):
+            if existing.get("dropoff_otp") and (not status_update.otp or status_update.otp.strip() != existing.get("dropoff_otp").strip()):
                 raise HTTPException(status_code=400, detail="Invalid Dropoff OTP")
 
         result = db.deliveries.update_one(

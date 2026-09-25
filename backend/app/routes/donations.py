@@ -55,7 +55,7 @@ async def get_donations(current_user: dict = Depends(get_current_user)):
         for doc in cursor:
             doc["id"] = str(doc["_id"])
             if doc.get("status") in ["DRIVER_ASSIGNED", "DRIVER_ACCEPTED", "PICKUP_STARTED", "PICKED_UP", "OUT_FOR_DELIVERY", "DELIVERED"]:
-                delivery = db.deliveries.find_one({"donation_id": doc["id"]})
+                delivery = db.deliveries.find_one({"donation_id": doc["id"]}, sort=[("created_at", -1)])
                 if delivery:
                     doc["driver_incentive"] = delivery.get("incentive_amount")
                     if current_user["role"] == "DONOR":
@@ -83,7 +83,7 @@ async def get_donation(id: str, current_user: dict = Depends(get_current_user)):
                 
             doc["id"] = str(doc["_id"])
             if doc.get("status") in ["DRIVER_ASSIGNED", "DRIVER_ACCEPTED", "PICKUP_STARTED", "PICKED_UP", "OUT_FOR_DELIVERY", "DELIVERED"]:
-                delivery = db.deliveries.find_one({"donation_id": doc["id"]})
+                delivery = db.deliveries.find_one({"donation_id": doc["id"]}, sort=[("created_at", -1)])
                 if delivery:
                     doc["driver_incentive"] = delivery.get("incentive_amount")
                     if current_user["role"] == "DONOR":
