@@ -72,6 +72,8 @@ export default function DeliveryMap({ pickupLocation, destinationLocation, drive
   
   const pickup = pickupLocation || fallbackCoord;
 
+  const showDriver = ['ACCEPTED', 'PICKUP_STARTED', 'PICKED_UP', 'OUT_FOR_DELIVERY'].includes(deliveryStatus);
+
   return (
     <div className="h-64 w-full rounded-xl overflow-hidden shadow-[0_1px_3px_0_rgba(15,23,42,0.05)] border border-slate-200 mt-4 relative z-0">
       <MapContainer center={pickup} zoom={13} style={{ height: '100%', width: '100%' }}>
@@ -109,7 +111,7 @@ export default function DeliveryMap({ pickupLocation, destinationLocation, drive
           </Marker>
         )}
         
-        {driverLocation && (
+        {showDriver && driverLocation && (
           <Marker position={driverLocation}>
             <Popup>
               <div className="font-bold text-brand-sky">Driver (Live)</div>
@@ -117,7 +119,7 @@ export default function DeliveryMap({ pickupLocation, destinationLocation, drive
           </Marker>
         )}
 
-        <MapBounds pickup={pickupLocation} dropoff={destinationLocation} driver={driverLocation} />
+        <MapBounds pickup={pickupLocation} dropoff={destinationLocation} driver={showDriver ? driverLocation : null} />
       </MapContainer>
     </div>
   );
