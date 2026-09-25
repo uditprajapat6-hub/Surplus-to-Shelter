@@ -35,7 +35,7 @@ export default function DeliveryMap({ pickupLocation, destinationLocation, drive
     let start, end;
     
     // Dynamically choose route based on current task
-    if (['ASSIGNED', 'ACCEPTED', 'PICKUP_STARTED'].includes(deliveryStatus)) {
+    if (['ACCEPTED', 'PICKUP_STARTED'].includes(deliveryStatus)) {
       start = driverLocation;
       end = pickupLocation;
     } else if (['PICKED_UP', 'OUT_FOR_DELIVERY'].includes(deliveryStatus)) {
