@@ -7,12 +7,18 @@ from app.config import settings
 
 router = APIRouter(prefix="/api/impact", tags=["Impact"])
 
+from typing import List, Dict, Any
+
+class TrendItem(BaseModel):
+    name: str
+    rescued: float
+
 class ImpactMetrics(BaseModel):
     total_food_rescued_kg: float
     equivalent_meals: int
     co2_emissions_saved_kg: float
     total_deliveries_completed: int
-    monthly_trend: List[Dict[str, float]]
+    monthly_trend: List[TrendItem]
 
 @router.get("", response_model=ImpactMetrics)
 async def get_impact_metrics():

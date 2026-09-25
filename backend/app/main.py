@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database.mongodb import connect_to_mongo, close_mongo_connection
-from app.routes import donations, shelters, matching, deliveries, impact
+from app.routes import donations, shelters, matching, deliveries, impact, auth
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -23,6 +23,7 @@ app.include_router(shelters.router)
 app.include_router(matching.router)
 app.include_router(deliveries.router)
 app.include_router(impact.router)
+app.include_router(auth.router)
 
 # Configure CORS
 app.add_middleware(

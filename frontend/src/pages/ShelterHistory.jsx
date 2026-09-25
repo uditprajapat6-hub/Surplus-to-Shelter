@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { getDonations } from '../services/api';
 import { Filter, ChevronDown } from 'lucide-react';
-
-const MOCK_SHELTER_ID = "mock_shelter_1";
+import { useAuth } from '../context/AuthContext';
 
 export default function ShelterHistory() {
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useAuth();
   
   // Filters: All, Pending, Accepted, Received
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -28,7 +28,7 @@ export default function ShelterHistory() {
 
   // Shelter history specifically views donations assigned to them
   const shelterDonations = donations.filter(d => 
-    d.matched_shelter_id === MOCK_SHELTER_ID || (!d.matched_shelter_id && d.status === 'MATCHED')
+    d.matched_shelter_id === user?.id || (d.status !== 'POSTED' && d.matched_shelter_id === user?.id)
   );
 
   const filteredDonations = shelterDonations.filter(d => {

@@ -10,6 +10,14 @@ const api = axios.create({
   },
 });
 
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 export const getDonations = async () => {
   const response = await api.get('/donations');
   return response.data;
@@ -45,8 +53,8 @@ export const createDelivery = async (data) => {
   return response.data;
 };
 
-export const updateDeliveryStatus = async (id, status) => {
-  const response = await api.put(`/deliveries/${id}/status`, { status });
+export const updateDeliveryStatus = async (id, status, otp = null) => {
+  const response = await api.put(`/deliveries/${id}/status`, { status, otp });
   return response.data;
 };
 
@@ -55,6 +63,30 @@ export const getImpact = async () => {
   return response.data;
 };
 
+export const login = async (email, password) => {
+  const formData = new URLSearchParams();
+  formData.append('username', email);
+  formData.append('password', password);
+  const response = await axios.post(`${API_URL}/auth/login`, formData, {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+  });
+  if (response.data.access_token) {
+    localStorage.setItem('token', response.data.access_token);
+    localStorage.setItem('role', response.data.role); // Standardized key to match AuthContext
+    localStorage.setItem('user_id', response.data.user_id);
+  }
+  return response.data;
+};
+
+export const register = async (userData) => {
+  const response = await api.post('/auth/register', userData);
+  return response.data;
+};
+
 // Add other api calls as we build out more phases...
+export const getShelter = async (id) => {
+  const response = await api.get(`/shelters/${id}`);
+  return response.data;
+};
 
 export default api;

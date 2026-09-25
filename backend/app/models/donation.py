@@ -15,11 +15,15 @@ class DonationStatus(str, Enum):
     POSTED = "POSTED"
     MATCHING = "MATCHING"
     MATCHED = "MATCHED"
+    SHELTER_ACCEPTED = "SHELTER_ACCEPTED"
     DRIVER_ASSIGNED = "DRIVER_ASSIGNED"
+    DRIVER_ACCEPTED = "DRIVER_ACCEPTED"
+    PICKUP_STARTED = "PICKUP_STARTED"
     PICKED_UP = "PICKED_UP"
     OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY"
     DELIVERED = "DELIVERED"
     EXPIRED = "EXPIRED"
+    CANCELLED = "CANCELLED"
 
 class DonationBase(BaseModel):
     food_name: str
@@ -49,6 +53,9 @@ class DonationResponse(DonationBase):
     created_at: datetime
     matched_shelter_id: Optional[str] = None
     match_score: Optional[float] = None
+    pickup_otp: Optional[str] = None
+    dropoff_otp: Optional[str] = None
+    driver_incentive: Optional[float] = None
 
     class Config:
         populate_by_name = True
